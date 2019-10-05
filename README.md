@@ -1,2 +1,2 @@
-# Surfs-Up-
-This is my homework for assignment 10-Advanced-Data-Storage-and-Retrieval
+# Surfs-Up- Weather Analysis
+This project was completed using Pandas, MatPlotLib, Python, Numpy, and SQLAlchemy.
