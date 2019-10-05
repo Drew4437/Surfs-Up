@@ -4,6 +4,7 @@
 from flask import Flask, jsonify
 import pandas as pd
 import datetime as dt
+import numpy as np
 
 # create app
 app = Flask(__name__)
@@ -12,7 +13,7 @@ app = Flask(__name__)
 # Step 2: Set up db connection and session
 # ----------------------------------------------------------------------
 # set up sqlalchemy engine
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
