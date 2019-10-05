@@ -22,7 +22,6 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 # map classes
-print (Base.classes.keys())
 Station = Base.classes.station
 Measurement = Base.classes.measurement
 
@@ -33,15 +32,14 @@ session = Session(engine)
 # ---------------------------------------------------------------------- 
 @app.route("/")
 def welcome():
-    return (
-        f"Welcome to the Weather App!<br/>"
-        f"Available Routes:<br/>"
-        f"/api/v1.0/precipitation<br/>"
-        f"/api/v1.0/station<br/>"
-        f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/start<br/>" 
-        f"/api/v1.0/start and end<br/>"
-        )
+    return (f"Welcome to the Weather App!<br/>"
+            f"Available Routes:<br/>"
+            f"/api/v1.0/precipitation<br/>"
+            f"/api/v1.0/station<br/>"
+            f"/api/v1.0/tobs<br/>"
+            f"/api/v1.0/<start><br/>" 
+            f"/api/v1.0/<start>/<end><br/>"
+            )
 
 
 @app.route('/api/v1.0/precipitation')
@@ -70,20 +68,24 @@ def normal():
     return jsonify(station4)
 
 
-@app.route('/api/v1.0/start/')
-def temps_startOnly(start):
-    query = (f'SELECT AVG(temp) AS "Average Temperature", MIN(temp) \
-                AS "Minimum Temperature", MAX(temp) AS "Maximum Temperature" \
-                FROM  WHERE date >= "{start}"')
-    return jsonify(pd.read_sql(query, engine).to_dict(orient='records'))
+@app.route('/api/v1.0/<start>')
+def startdate(start = None):
+   session = Session(engine)
+   selection = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+   startdateres = session.query(*selection).\
+       filter(Measurement.date >= start).all()
+   result = list(np.ravel(startdateres))
+   return jsonify(result)
 
-
-@app.route('/api/v1.0/start and end/{start}{end}')
-def temps_startAndEnd(start, end):
-    query = (f'SELECT AVG(temp) AS "Average Temperature", MIN(temp) \
-                AS "Minimum Temperature", MAX(temp) AS "Maximum Temperature" \
-                FROM  WHERE date >= "{start}" AND date <= "{end}"')
-    return jsonify(pd.read_sql(query, engine).to_dict(orient='records'))  
+@app.route("/api/v1.0/<start>/<end>")
+def dates(start = None, end = None):
+   session = Session(engine)
+   selection = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+   dateres = session.query(*selection).\
+       filter(Measurement.date >= start).\
+       filter(Measurement.date <= end).all()
+   # result = list(np.ravel(dateres))
+   return jsonify(dateres)
 
 # ----------------------------------------------------------------------
 # Step 4: Define main
